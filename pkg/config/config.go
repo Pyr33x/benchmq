@@ -1,4 +1,4 @@
-package cmd
+package config
 
 import (
 	"log"
@@ -10,18 +10,18 @@ import (
 // Config represents the entire yaml config file fields
 type Config struct {
 	Name   string `yaml:"name"`
-	Server Server `yaml:"server"`
-	Client Client `yaml:"client"`
+	Server server `yaml:"server"`
+	Client client `yaml:"client"`
 }
 
 // Server represents the server configuration fields
-type Server struct {
+type server struct {
 	Host string `yaml:"host"`
 	Port uint16 `yaml:"port"`
 }
 
 // Client represents the client configuration fields
-type Client struct {
+type client struct {
 	ClientID     string `yaml:"client_id"`
 	KeepAlive    uint16 `yaml:"keep_alive"`
 	CleanSession bool   `yaml:"clean_session"`

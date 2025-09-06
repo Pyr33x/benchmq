@@ -6,7 +6,7 @@ import (
 	"time"
 
 	mq "github.com/eclipse/paho.mqtt.golang"
-	"github.com/pyr33x/benchmq/cmd"
+	"github.com/pyr33x/benchmq/pkg/config"
 	"github.com/pyr33x/benchmq/pkg/er"
 )
 
@@ -15,7 +15,7 @@ type Adapter struct {
 	wg     sync.WaitGroup
 }
 
-func NewClient(cfg cmd.Config) *Adapter {
+func NewClient(cfg config.Config) *Adapter {
 	// Initialize MQTT client options
 	opts := mq.NewClientOptions()
 
