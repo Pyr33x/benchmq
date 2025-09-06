@@ -7,17 +7,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Config represents the entire yaml config file fields
 type Config struct {
 	Name   string `yaml:"name"`
 	Server Server `yaml:"server"`
 	Client Client `yaml:"client"`
 }
 
+// Server represents the server configuration fields
 type Server struct {
 	Host string `yaml:"host"`
 	Port string `yaml:"port"`
 }
 
+// Client represents the client configuration fields
 type Client struct {
 	ClientID     string `yaml:"client_id"`
 	KeepAlive    uint16 `yaml:"keep_alive"`
@@ -26,6 +29,7 @@ type Client struct {
 	Password     string `yaml:"password"`
 }
 
+// InitializeCfg reads the config file and returns a pointer to the Config struct
 func InitializeCfg() *Config {
 	rawCfg, err := os.ReadFile("config.yml")
 	if err != nil {
