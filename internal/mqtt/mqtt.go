@@ -43,3 +43,8 @@ func (a *Adapter) Connect() error {
 	}
 	return nil
 }
+
+func (a *Adapter) Disconnect() {
+	a.client.Disconnect(200)
+	a.wg.Wait()
+}
