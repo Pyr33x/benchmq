@@ -17,7 +17,7 @@ type Config struct {
 // Server represents the server configuration fields
 type Server struct {
 	Host string `yaml:"host"`
-	Port string `yaml:"port"`
+	Port uint16 `yaml:"port"`
 }
 
 // Client represents the client configuration fields
