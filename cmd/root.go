@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "benchmq",
 	Short: "BenchMQ is a simple, fast, and lightweight CLI to benchmark your MQTT broker with ease.",
