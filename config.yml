@@ -1,0 +1,11 @@
+name: BenchMQ
+
+server:
+  host: localhost
+  port: 1883
+client:
+  client_id: benchmq-client
+  keep_alive: 60
+  clean_session: true
+  username:
+  password:
