@@ -129,9 +129,9 @@ func WithClients(clients int) Option {
 	}
 }
 
-func WithClientID(clientId string) Option {
+func WithClientID(clientID string) Option {
 	return func(b *Bench) {
-		b.ClientID = clientId
+		b.ClientID = clientID
 	}
 }
 
