@@ -10,9 +10,11 @@ import (
 
 // Config represents the entire yaml config file fields
 type Config struct {
-	Name   string `yaml:"name"`
-	Server server `yaml:"server"`
-	Client Client `yaml:"client"`
+	Name        string `yaml:"name"`
+	Version     string `yaml:"version"`
+	Environment string `yaml:"environment"`
+	Server      server `yaml:"server"`
+	Client      Client `yaml:"client"`
 }
 
 // Server represents the server configuration fields
@@ -81,6 +83,12 @@ func (c *Config) Validate() error {
 
 // SetDefaults sets the default values to fields when values are not acceptable
 func (c *Config) SetDefaults() {
+	if c.Version == "" {
+		c.Version = "1.0.0"
+	}
+	if c.Environment == "" {
+		c.Environment = "development"
+	}
 	if c.Server.Host == "" {
 		c.Server.Host = "localhost"
 	}

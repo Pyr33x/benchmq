@@ -3,8 +3,12 @@ package cmd
 import (
 	"os"
 
+	"github.com/pyr33x/benchmq/pkg/config"
+	"github.com/pyr33x/benchmq/pkg/logger"
 	"github.com/spf13/cobra"
 )
+
+var Cfg *config.Config
 
 var rootCmd = &cobra.Command{
 	Use:   "benchmq",
@@ -19,4 +23,15 @@ func Execute() {
 	}
 }
 
-func init() {}
+func init() {
+	Cfg, _ = config.InitializeCfg()
+	switch Cfg.Environment {
+	case "production":
+		logger.InitGlobalLogger(logger.ProductionConfig())
+	case "development":
+		logger.InitGlobalLogger(logger.DevelopmentConfig())
+	default:
+		logger.InitGlobalLogger(logger.DevelopmentConfig())
+		logger.Warn("Invalid server environment config value, assigning default development.")
+	}
+}
