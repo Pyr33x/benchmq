@@ -36,10 +36,12 @@ func NewClient(cfg config.Config) *Adapter {
 
 func (a *Adapter) Connect() error {
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
+		tErr := token.Error()
 		return &er.Error{
 			Package: "MQTT",
 			Func:    "Connect",
 			Message: er.ErrMqttConnectionFailed,
+			Raw:     tErr,
 		}
 	}
 	return nil

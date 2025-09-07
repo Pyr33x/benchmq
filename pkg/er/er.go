@@ -17,10 +17,11 @@ type Error struct {
 	Package string
 	Func    string
 	Message error
+	Raw     error
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("package: %s, func: %s, error: %v", e.Package, e.Func, e.Message)
+	return fmt.Sprintf("package: %s, func: %s, error: %v, rawError: %v", e.Package, e.Func, e.Message, e.Raw)
 }
 
 func (e *Error) Unwrap() error {

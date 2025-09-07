@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"os"
 
 	"github.com/pyr33x/benchmq/pkg/er"
@@ -41,8 +42,9 @@ func InitializeCfg() (*Config, error) {
 	}
 
 	var cfg Config
-	err = yaml.Unmarshal(rawCfg, &cfg)
-	if err != nil {
+	dec := yaml.NewDecoder(bytes.NewReader(rawCfg))
+	dec.KnownFields(true)
+	if err = dec.Decode(&cfg); err != nil {
 		return nil, &er.Error{
 			Package: "Config",
 			Func:    "InitializeCfg",
