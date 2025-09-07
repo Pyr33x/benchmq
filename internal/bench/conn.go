@@ -2,14 +2,15 @@ package bench
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/pyr33x/benchmq/internal/mqtt"
+	"github.com/pyr33x/benchmq/pkg/logger"
 )
 
 func (b *Bench) RunConnections() {
-	now := time.Now()
+	start := time.Now()
+	b.logger.Info("Started connection benchmark", logger.Int("current_time", int(start.UnixNano())))
 
 	for i := 0; i < b.clients; i++ {
 		b.wg.Add(1)
@@ -21,16 +22,16 @@ func (b *Bench) RunConnections() {
 			client := mqtt.NewClient(&cfg)
 			defer client.Disconnect()
 
-			log.Printf("Client: %s ― Connecting", cfg.Client.ClientID)
+			b.logger.Info("Connecting Client", logger.ClientID(cfg.Client.ClientID), logger.State("connecting"))
 			if err := client.Connect(); err != nil {
-				log.Printf("Client: %d ― Failed: %v", id, err)
+				b.logger.Error("Couldn't establish client", logger.ClientID(cfg.Client.ClientID), logger.State("failed"))
 				return
 			}
-			log.Printf("Client: %s ― Connected", cfg.Client.ClientID)
+			b.logger.LogClientConnection(cfg.Client.ClientID)
 
 		}(i)
 	}
 
 	b.wg.Wait()
-	log.Println(time.Since(now))
+	b.logger.Info("Finished connection benchmark", logger.TrackTime(start))
 }

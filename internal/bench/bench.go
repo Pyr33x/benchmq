@@ -5,6 +5,7 @@ import (
 
 	"github.com/pyr33x/benchmq/pkg/config"
 	"github.com/pyr33x/benchmq/pkg/er"
+	"github.com/pyr33x/benchmq/pkg/logger"
 )
 
 type QoSLevel uint8
@@ -22,6 +23,7 @@ type Bench struct {
 	port         uint16
 	wg           sync.WaitGroup // Wait Group
 	cfg          *config.Config // Config
+	logger       *logger.Logger // Logger
 }
 
 type Option func(*Bench)
@@ -33,7 +35,7 @@ const (
 )
 
 const (
-	DefaultDelay        = 100              // Default delay between connection
+	DefaultDelay        = 1000             // Default delay between connection
 	DefaultClients      = 100              // Default clients to connect
 	DefaultClientID     = "benchmq-client" // Default client id
 	DefaultTopic        = "bench/test"     // Default publish/subscribe topic
@@ -66,6 +68,8 @@ func NewBenchmark(cfg *config.Config, options ...Option) (*Bench, error) {
 		host:         DefaultHost,
 		port:         DefaultPort,
 		cfg:          cfg,
+		wg:           sync.WaitGroup{},
+		logger:       logger.NewBenchmarkLogger("Benchmark"),
 	}
 
 	for _, option := range options {
