@@ -7,6 +7,10 @@ import (
 
 var (
 	ErrMqttConnectionFailed = errors.New("mqtt connection failed")
+	ErrEmptyServerHost      = errors.New("server host cannot be empty")
+	ErrInvalidServerPort    = errors.New("server port is invalid")
+	ErrUnmarshalFailed      = errors.New("failed to unmarshal config file")
+	ErrConfigReadFailed     = errors.New("failed to read config file")
 )
 
 type Error struct {
