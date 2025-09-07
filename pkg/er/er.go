@@ -11,6 +11,12 @@ var (
 	ErrInvalidServerPort    = errors.New("server port is invalid")
 	ErrUnmarshalFailed      = errors.New("failed to unmarshal config file")
 	ErrConfigReadFailed     = errors.New("failed to read config file")
+	ErrInvalidQoS           = errors.New("bench: invalid QoS (must be 0, 1, or 2)")
+	ErrInvalidClients       = errors.New("bench: clients must be > 0")
+	ErrInvalidDelay         = errors.New("bench: delay must be >= 0")
+	ErrInvalidPort          = errors.New("bench: port must be in 1..65535")
+	ErrEmptyHost            = errors.New("bench: host must be non-empty")
+	ErrEmptyTopic           = errors.New("bench: topic must be non-empty")
 )
 
 type Error struct {
