@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/pyr33x/benchmq/pkg/config"
 	"github.com/pyr33x/benchmq/pkg/logger"
@@ -34,7 +35,8 @@ func init() {
 	Cfg = cfg
 
 	var lcfg logger.Config
-	switch Cfg.Environment {
+	env := strings.ToLower(Cfg.Environment)
+	switch env {
 	case "production":
 		lcfg = logger.ProductionConfig()
 	case "development":
