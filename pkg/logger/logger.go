@@ -228,7 +228,7 @@ func (l *Logger) LogClientConnection(clientID string, attrs ...slog.Attr) {
 	}
 	baseAttrs = append(baseAttrs, attrs...)
 
-	l.LogAttrs(context.Background(), slog.LevelInfo, "Client connection event", baseAttrs...)
+	l.LogAttrs(context.Background(), slog.LevelInfo, "Connection", baseAttrs...)
 }
 
 // LogPublish logs PUBLISH packet details
@@ -241,7 +241,7 @@ func (l *Logger) LogPublish(clientID, topic string, qos int, retain bool, attrs 
 	}
 	baseAttrs = append(baseAttrs, attrs...)
 
-	l.LogAttrs(context.Background(), slog.LevelInfo, "Message published", baseAttrs...)
+	l.LogAttrs(context.Background(), slog.LevelInfo, "Published", baseAttrs...)
 }
 
 // ClientID creates a client_id attribute
