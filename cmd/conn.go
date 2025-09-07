@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -9,35 +6,66 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// connCmd represents the conn command
 var connCmd = &cobra.Command{
 	Use:   "conn",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Run a connection benchmark against the configured MQTT broker.",
+	Long:  `Opens N concurrent MQTT connections (from config or flags) to measure connection throughput, failures, and timing.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		bench, err := bench.NewBenchmark(Cfg)
+		// Parse flags
+		clients, err := cmd.Flags().GetInt("clients")
 		if err != nil {
-			logger.Error("ERRRRRRR", logger.ErrorAttr(err))
+			logger.Error("failed to parse clients flag", logger.ErrorAttr(err))
+			return
 		}
-		bench.RunConnections()
+
+		delay, err := cmd.Flags().GetInt("delay")
+		if err != nil {
+			logger.Error("failed to parse delay flag", logger.ErrorAttr(err))
+			return
+		}
+
+		clean, err := cmd.Flags().GetBool("clean")
+		if err != nil {
+			logger.Error("failed to parse clean flag", logger.ErrorAttr(err))
+			return
+		}
+
+		keepalive, err := cmd.Flags().GetUint16("keepalive")
+		if err != nil {
+			logger.Error("failed to parse keepalive flag", logger.ErrorAttr(err))
+			return
+		}
+
+		clientID, err := cmd.Flags().GetString("clientID")
+		if err != nil {
+			logger.Error("failed to parse clientID flag", logger.ErrorAttr(err))
+			return
+		}
+
+		b, err := bench.NewBenchmark(
+			Cfg,
+			bench.WithClients(clients),
+			bench.WithDelay(delay),
+			bench.WithCleanSession(clean),
+			bench.WithKeepAlive(keepalive),
+			bench.WithClientID(clientID),
+		)
+		if err != nil {
+			logger.Error("Benchmark failed", logger.ErrorAttr(err))
+		}
+
+		// Run benchmark
+		b.RunConnections()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(connCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// connCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// connCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Register flags
+	connCmd.Flags().StringP("clientID", "i", "bencmq-client", "Client ID for MQTT connections")
+	connCmd.Flags().IntP("clients", "c", 100, "Number of concurrent clients to connect")
+	connCmd.Flags().IntP("delay", "d", 10, "Delay between each client connection")
+	connCmd.Flags().BoolP("clean", "x", true, "Clean previous session when connecting")
+	connCmd.Flags().Uint16P("keepalive", "k", 60, "Keepalive interval in seconds")
 }
