@@ -10,7 +10,7 @@ import (
 
 func (b *Bench) RunConnections() {
 	start := time.Now()
-	b.logger.Info("Started connection benchmark", logger.Int("current_time", int(start.UnixNano())))
+	b.logger.Info("Started connection benchmark", logger.Int("time", int(start.UnixNano())))
 
 	for i := 0; i < b.clients; i++ {
 		b.wg.Add(1)
@@ -18,7 +18,7 @@ func (b *Bench) RunConnections() {
 			defer b.wg.Done()
 
 			cfg := *b.cfg
-			cfg.Client.ClientID = fmt.Sprintf("benchmq-client-%d", id)
+			cfg.Client.ClientID = fmt.Sprintf("%s-%d", b.clientID, id)
 			client := mqtt.NewClient(&cfg)
 			defer client.Disconnect()
 
@@ -33,5 +33,5 @@ func (b *Bench) RunConnections() {
 	}
 
 	b.wg.Wait()
-	b.logger.Info("Finished connection benchmark", logger.TrackTime(start))
+	b.logger.Info("Finished connection benchmark", logger.String("time", fmt.Sprintf("%fs", logger.TrackRawTime(start))))
 }
