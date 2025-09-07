@@ -12,7 +12,7 @@ import (
 type Config struct {
 	Name   string `yaml:"name"`
 	Server server `yaml:"server"`
-	Client client `yaml:"client"`
+	Client Client `yaml:"client"`
 }
 
 // Server represents the server configuration fields
@@ -22,7 +22,7 @@ type server struct {
 }
 
 // Client represents the client configuration fields
-type client struct {
+type Client struct {
 	ClientID     string `yaml:"client_id"`
 	KeepAlive    uint16 `yaml:"keep_alive"`
 	CleanSession bool   `yaml:"clean_session"`
