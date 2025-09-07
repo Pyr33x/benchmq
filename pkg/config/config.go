@@ -67,7 +67,7 @@ func (c *Config) Validate() error {
 			Message: er.ErrEmptyServerHost,
 		}
 	}
-	if c.Server.Port == 0 || c.Server.Port > 65535 {
+	if c.Server.Port == 0 {
 		return &er.Error{
 			Package: "Config",
 			Func:    "Validate",
