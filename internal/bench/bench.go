@@ -16,17 +16,35 @@ type Bench struct {
 
 type Option func(*Bench)
 
+const (
+	QoS0 QoSLevel = 0
+	QoS1 QoSLevel = 1
+	QoS2 QoSLevel = 2
+)
+
+const (
+	DefaultDelay        = 100
+	DefaultClients      = 100
+	DefaultClientID     = "benchmq-client"
+	DefaultTopic        = "bench/test"
+	DefaultCleanSession = true
+	DefaultQoS          = QoS0
+	DefaultKeepAlive    = 60
+	DefaultHost         = "localhost"
+	DefaultPort         = 1883
+)
+
 func NewBenchmark(options ...Option) *Bench {
 	bench := Bench{
-		Delay:        100,
-		Clients:      100,
-		ClientID:     "benchmq-client",
-		Topic:        "bench/test",
-		CleanSession: true,
-		QoS:          0,
-		KeepAlive:    60,
-		Host:         "localhost",
-		Port:         1883,
+		Delay:        DefaultDelay,
+		Clients:      DefaultClients,
+		ClientID:     DefaultClientID,
+		Topic:        DefaultTopic,
+		CleanSession: DefaultCleanSession,
+		QoS:          DefaultQoS,
+		KeepAlive:    DefaultKeepAlive,
+		Host:         DefaultHost,
+		Port:         DefaultPort,
 	}
 
 	for _, option := range options {
