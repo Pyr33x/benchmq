@@ -10,12 +10,13 @@ var (
 )
 
 type Error struct {
-	Context string
+	Package string
+	Func    string
 	Message error
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("context: %s, error: %v", e.Context, e.Message)
+	return fmt.Sprintf("package: %s, func: %s, error: %v", e.Package, e.Func, e.Message)
 }
 
 func (e *Error) Unwrap() error {
