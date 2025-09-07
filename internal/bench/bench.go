@@ -46,6 +46,15 @@ const (
 
 // NewBenchmark constructor initializes the bench struct
 func NewBenchmark(cfg *config.Config, options ...Option) (*Bench, error) {
+	if cfg == nil {
+		return nil, &er.Error{
+			Package: "Bench",
+			Func:    "NewBenchmark",
+			Message: er.ErrNilConfig,
+			Raw:     er.ErrNilConfig,
+		}
+	}
+
 	bench := Bench{
 		delay:        DefaultDelay,
 		clients:      DefaultClients,

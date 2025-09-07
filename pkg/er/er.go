@@ -17,6 +17,7 @@ var (
 	ErrInvalidPort          = errors.New("bench: port must be in 1..65535")
 	ErrEmptyHost            = errors.New("bench: host must be non-empty")
 	ErrEmptyTopic           = errors.New("bench: topic must be non-empty")
+	ErrNilConfig            = errors.New("bench: config cannot be nil")
 )
 
 type Error struct {
