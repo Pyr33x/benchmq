@@ -16,7 +16,7 @@ type Bench struct {
 	clients      int
 	clientID     string
 	topic        string
-	cleanSession bool
+	cleanSession *bool
 	qos          QoSLevel
 	keepAlive    uint16
 	host         string
@@ -60,9 +60,9 @@ func NewBenchmark(cfg *config.Config, options ...Option) (*Bench, error) {
 		clients:      DefaultClients,
 		clientID:     DefaultClientID,
 		topic:        DefaultTopic,
-		cleanSession: DefaultCleanSession,
+		cleanSession: &cfg.Client.CleanSession,
 		qos:          DefaultQoS,
-		keepAlive:    DefaultKeepAlive,
+		keepAlive:    cfg.Client.KeepAlive,
 		host:         cfg.Server.Host,
 		port:         cfg.Server.Port,
 		cfg:          cfg,
@@ -136,6 +136,13 @@ func (b *Bench) validate() error {
 	if b.clientID == "" {
 		b.clientID = DefaultClientID
 	}
+	if b.keepAlive == 0 {
+		b.keepAlive = DefaultKeepAlive
+	}
+	if b.cleanSession == nil {
+		cs := true
+		b.cleanSession = &cs
+	}
 	return nil
 }
 
@@ -165,7 +172,10 @@ func WithTopic(topic string) Option {
 
 func WithCleanSession(cleanSession bool) Option {
 	return func(b *Bench) {
-		b.cleanSession = cleanSession
+		b.cleanSession = &cleanSession
+		if b.cfg != nil {
+			b.cfg.Client.CleanSession = cleanSession
+		}
 	}
 }
 
@@ -178,6 +188,9 @@ func WithQoS(qos uint16) Option {
 func WithKeepAlive(keepAlive uint16) Option {
 	return func(b *Bench) {
 		b.keepAlive = keepAlive
+		if b.cfg != nil {
+			b.cfg.Client.KeepAlive = keepAlive
+		}
 	}
 }
 
