@@ -1,20 +1,27 @@
 package bench
 
-import "github.com/pyr33x/benchmq/pkg/er"
+import (
+	"sync"
+
+	"github.com/pyr33x/benchmq/pkg/config"
+	"github.com/pyr33x/benchmq/pkg/er"
+)
 
 type QoSLevel uint8
 
 // Bench represents the benchmark fields
 type Bench struct {
-	Delay        int
-	Clients      int
-	ClientID     string
-	Topic        string
-	CleanSession bool
-	QoS          QoSLevel
-	KeepAlive    uint16
-	Host         string
-	Port         uint16
+	delay        int
+	clients      int
+	clientID     string
+	topic        string
+	cleanSession bool
+	qos          QoSLevel
+	keepAlive    uint16
+	host         string
+	port         uint16
+	wg           sync.WaitGroup // Wait Group
+	cfg          *config.Config // Config
 }
 
 type Option func(*Bench)
@@ -38,17 +45,18 @@ const (
 )
 
 // NewBenchmark constructor initializes the bench struct
-func NewBenchmark(options ...Option) (*Bench, error) {
+func NewBenchmark(cfg *config.Config, options ...Option) (*Bench, error) {
 	bench := Bench{
-		Delay:        DefaultDelay,
-		Clients:      DefaultClients,
-		ClientID:     DefaultClientID,
-		Topic:        DefaultTopic,
-		CleanSession: DefaultCleanSession,
-		QoS:          DefaultQoS,
-		KeepAlive:    DefaultKeepAlive,
-		Host:         DefaultHost,
-		Port:         DefaultPort,
+		delay:        DefaultDelay,
+		clients:      DefaultClients,
+		clientID:     DefaultClientID,
+		topic:        DefaultTopic,
+		cleanSession: DefaultCleanSession,
+		qos:          DefaultQoS,
+		keepAlive:    DefaultKeepAlive,
+		host:         DefaultHost,
+		port:         DefaultPort,
+		cfg:          cfg,
 	}
 
 	for _, option := range options {
@@ -57,7 +65,7 @@ func NewBenchmark(options ...Option) (*Bench, error) {
 		}
 	}
 
-	if err := bench.Validate(); err != nil {
+	if err := bench.validate(); err != nil {
 		return nil, err
 	}
 
@@ -65,8 +73,8 @@ func NewBenchmark(options ...Option) (*Bench, error) {
 }
 
 // Validate checks semantic correctness of the benchmark configuration
-func (b Bench) Validate() error {
-	if b.Clients <= 0 {
+func (b *Bench) validate() error {
+	if b.clients <= 0 {
 		return &er.Error{
 			Package: "Bench",
 			Func:    "Validate",
@@ -74,7 +82,7 @@ func (b Bench) Validate() error {
 			Raw:     er.ErrInvalidClients,
 		}
 	}
-	if b.Delay < 0 {
+	if b.delay < 0 {
 		return &er.Error{
 			Package: "Bench",
 			Func:    "Validate",
@@ -82,7 +90,7 @@ func (b Bench) Validate() error {
 			Raw:     er.ErrInvalidDelay,
 		}
 	}
-	if b.Host == "" {
+	if b.host == "" {
 		return &er.Error{
 			Package: "Bench",
 			Func:    "Validate",
@@ -90,7 +98,7 @@ func (b Bench) Validate() error {
 			Raw:     er.ErrEmptyHost,
 		}
 	}
-	if b.Topic == "" {
+	if b.topic == "" {
 		return &er.Error{
 			Package: "Bench",
 			Func:    "Validate",
@@ -98,7 +106,7 @@ func (b Bench) Validate() error {
 			Raw:     er.ErrEmptyTopic,
 		}
 	}
-	if b.Port == 0 {
+	if b.port == 0 {
 		return &er.Error{
 			Package: "Bench",
 			Func:    "Validate",
@@ -106,7 +114,7 @@ func (b Bench) Validate() error {
 			Raw:     er.ErrInvalidPort,
 		}
 	}
-	if b.QoS > QoS2 {
+	if b.qos > QoS2 {
 		return &er.Error{
 			Package: "Bench",
 			Func:    "Validate",
@@ -119,54 +127,54 @@ func (b Bench) Validate() error {
 
 func WithDelay(delay int) Option {
 	return func(b *Bench) {
-		b.Delay = delay
+		b.delay = delay
 	}
 }
 
 func WithClients(clients int) Option {
 	return func(b *Bench) {
-		b.Clients = clients
+		b.clients = clients
 	}
 }
 
 func WithClientID(clientID string) Option {
 	return func(b *Bench) {
-		b.ClientID = clientID
+		b.clientID = clientID
 	}
 }
 
 func WithTopic(topic string) Option {
 	return func(b *Bench) {
-		b.Topic = topic
+		b.topic = topic
 	}
 }
 
 func WithCleanSession(cleanSession bool) Option {
 	return func(b *Bench) {
-		b.CleanSession = cleanSession
+		b.cleanSession = cleanSession
 	}
 }
 
 func WithQoS(qos uint16) Option {
 	return func(b *Bench) {
-		b.QoS = QoSLevel(qos)
+		b.qos = QoSLevel(qos)
 	}
 }
 
 func WithKeepAlive(keepAlive uint16) Option {
 	return func(b *Bench) {
-		b.KeepAlive = keepAlive
+		b.keepAlive = keepAlive
 	}
 }
 
 func WithHost(host string) Option {
 	return func(b *Bench) {
-		b.Host = host
+		b.host = host
 	}
 }
 
 func WithPort(port uint16) Option {
 	return func(b *Bench) {
-		b.Port = port
+		b.port = port
 	}
 }
