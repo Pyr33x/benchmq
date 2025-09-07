@@ -28,8 +28,8 @@ func (b *Bench) RunConnections() {
 				return
 			}
 			b.logger.LogClientConnection(cfg.Client.ClientID)
-
 		}(i)
+		time.Sleep(time.Duration(b.delay) * time.Millisecond)
 	}
 
 	b.wg.Wait()
