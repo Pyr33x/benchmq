@@ -15,7 +15,7 @@ type Adapter struct {
 	wg     sync.WaitGroup
 }
 
-func NewClient(cfg config.Config) *Adapter {
+func NewClient(cfg *config.Config) *Adapter {
 	// Initialize MQTT client options
 	opts := mq.NewClientOptions()
 
