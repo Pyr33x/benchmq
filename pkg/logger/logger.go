@@ -2,7 +2,6 @@ package logger
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -97,9 +96,15 @@ func New(config Config) *Logger {
 // GetGlobalLogger returns the global logger
 func GetGlobalLogger() *Logger {
 	mu.RLock()
-	defer mu.RUnlock()
+	gl := globalLogger
+	mu.RUnlock()
+	if gl != nil {
+		return gl
+	}
+	// Slow path
+	mu.Lock()
+	defer mu.Unlock()
 	if globalLogger == nil {
-		// Initialize with default config
 		globalLogger = New(DevelopmentConfig())
 	}
 	return globalLogger
@@ -162,7 +167,7 @@ func (l *Logger) Error(msg string, attrs ...slog.Attr) {
 // Fatal logs a fatal message and exits
 func (l *Logger) Fatal(msg string, attrs ...slog.Attr) {
 	l.LogAttrs(context.Background(), slog.LevelError, msg, attrs...)
-	panic(fmt.Sprintf("fatal error: %s", msg))
+	os.Exit(1)
 }
 
 // Debug logs a debug message using the global logger

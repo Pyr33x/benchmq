@@ -24,14 +24,30 @@ func Execute() {
 }
 
 func init() {
-	Cfg, _ = config.InitializeCfg()
+	cfg, err := config.InitializeCfg()
+	if err != nil || cfg == nil {
+		logger.InitGlobalLogger(logger.DevelopmentConfig())
+		logger.Error("Failed to initialize config", logger.ErrorAttr(err))
+		Cfg = cfg
+		return
+	}
+	Cfg = cfg
+
+	var lcfg logger.Config
 	switch Cfg.Environment {
 	case "production":
-		logger.InitGlobalLogger(logger.ProductionConfig())
+		lcfg = logger.ProductionConfig()
 	case "development":
-		logger.InitGlobalLogger(logger.DevelopmentConfig())
+		lcfg = logger.DevelopmentConfig()
 	default:
-		logger.InitGlobalLogger(logger.DevelopmentConfig())
-		logger.Warn("Invalid server environment config value, assigning default development.")
+		lcfg = logger.DevelopmentConfig()
+	}
+
+	lcfg.Service = "benchmq"
+	lcfg.Version = Cfg.Version
+	lcfg.Environment = Cfg.Environment
+	logger.InitGlobalLogger(lcfg)
+	if Cfg.Environment != "production" && Cfg.Environment != "development" {
+		logger.Warn("Invalid server environment config value, assigning default development.", logger.String("environment", Cfg.Environment))
 	}
 }

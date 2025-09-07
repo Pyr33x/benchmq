@@ -42,8 +42,6 @@ const (
 	DefaultCleanSession = true             // Default clean session state
 	DefaultQoS          = QoS0             // Default QoS level
 	DefaultKeepAlive    = 60               // Default connection keep alive
-	DefaultHost         = "localhost"      // Default broker host
-	DefaultPort         = 1883             // Default broker port
 )
 
 // NewBenchmark constructor initializes the bench struct
@@ -65,8 +63,8 @@ func NewBenchmark(cfg *config.Config, options ...Option) (*Bench, error) {
 		cleanSession: DefaultCleanSession,
 		qos:          DefaultQoS,
 		keepAlive:    DefaultKeepAlive,
-		host:         DefaultHost,
-		port:         DefaultPort,
+		host:         cfg.Server.Host,
+		port:         cfg.Server.Port,
 		cfg:          cfg,
 		wg:           sync.WaitGroup{},
 		logger:       logger.NewBenchmarkLogger("Benchmark"),
@@ -183,11 +181,17 @@ func WithKeepAlive(keepAlive uint16) Option {
 func WithHost(host string) Option {
 	return func(b *Bench) {
 		b.host = host
+		if b.cfg != nil {
+			b.cfg.Server.Host = host
+		}
 	}
 }
 
 func WithPort(port uint16) Option {
 	return func(b *Bench) {
 		b.port = port
+		if b.cfg != nil {
+			b.cfg.Server.Port = port
+		}
 	}
 }
