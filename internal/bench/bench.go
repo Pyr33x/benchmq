@@ -133,6 +133,10 @@ func (b *Bench) validate() error {
 			Raw:     er.ErrInvalidQoS,
 		}
 	}
+	// Set default clientID
+	if b.clientID == "" {
+		b.clientID = "benchmq-client"
+	}
 	return nil
 }
 
