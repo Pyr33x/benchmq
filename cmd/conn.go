@@ -63,9 +63,9 @@ func init() {
 	rootCmd.AddCommand(connCmd)
 
 	// Register flags
-	connCmd.Flags().StringP("clientID", "i", "bencmq-client", "Client ID for MQTT connections")
+	connCmd.Flags().StringP("clientID", "i", "benchmq-client", "Client ID for MQTT connections")
 	connCmd.Flags().IntP("clients", "c", 100, "Number of concurrent clients to connect")
-	connCmd.Flags().IntP("delay", "d", 10, "Delay between each client connection")
+	connCmd.Flags().IntP("delay", "d", 1000, "Delay between each client connection in milliseconds")
 	connCmd.Flags().BoolP("clean", "x", true, "Clean previous session when connecting")
 	connCmd.Flags().Uint16P("keepalive", "k", 60, "Keepalive interval in seconds")
 }

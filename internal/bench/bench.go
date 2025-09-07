@@ -30,12 +30,12 @@ type Option func(*Bench)
 
 const (
 	QoS0 QoSLevel = 0 // QoS At Most Once
-	QoS1 QoSLevel = 1 // QoS At Lease Once
+	QoS1 QoSLevel = 1 // QoS At Least Once
 	QoS2 QoSLevel = 2 // QoS Exactly Once
 )
 
 const (
-	DefaultDelay        = 1000             // Default delay between connection
+	DefaultDelay        = 1000             // Default delay between connection (ms)
 	DefaultClients      = 100              // Default clients to connect
 	DefaultClientID     = "benchmq-client" // Default client id
 	DefaultTopic        = "bench/test"     // Default publish/subscribe topic
@@ -66,7 +66,6 @@ func NewBenchmark(cfg *config.Config, options ...Option) (*Bench, error) {
 		host:         cfg.Server.Host,
 		port:         cfg.Server.Port,
 		cfg:          cfg,
-		wg:           sync.WaitGroup{},
 		logger:       logger.NewBenchmarkLogger("Benchmark"),
 	}
 
@@ -135,7 +134,7 @@ func (b *Bench) validate() error {
 	}
 	// Set default clientID
 	if b.clientID == "" {
-		b.clientID = "benchmq-client"
+		b.clientID = DefaultClientID
 	}
 	return nil
 }
