@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -75,6 +72,7 @@ Parameters:
 func init() {
 	rootCmd.AddCommand(pubCmd)
 
+	// Register flags
 	pubCmd.Flags().StringP("clientID", "i", "benchmq-client", "Client ID for MQTT connections")
 	pubCmd.Flags().IntP("clients", "c", 100, "Number of concurrent clients to connect")
 	pubCmd.Flags().IntP("delay", "d", 1000, "Delay between messages in milliseconds")
