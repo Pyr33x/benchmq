@@ -17,7 +17,9 @@ var pubCmd = &cobra.Command{
 	Long: `Publish messages to a topic with specified parameters.
 
 Parameters:
+	- clientID: Base client ID prefix (each client appends "-<n>")
     - clients: Number of concurrent clients
+    - delay: Delay between messages in milliseconds
     - count: Number of messages to publish per client
     - qos: Quality of service level (0, 1, 2)
     - message: The message payload
@@ -28,18 +30,68 @@ Parameters:
 	Run: func(cmd *cobra.Command, args []string) {
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+		defer signal.Stop(sigs)
 
 		// Parse flags
-		clientID, _ := cmd.Flags().GetString("clientID")
-		clients, _ := cmd.Flags().GetInt("clients")
-		delay, _ := cmd.Flags().GetInt("delay")
-		count, _ := cmd.Flags().GetInt("count")
-		retain, _ := cmd.Flags().GetBool("retain")
-		message, _ := cmd.Flags().GetString("message")
-		topic, _ := cmd.Flags().GetString("topic")
-		qos, _ := cmd.Flags().GetUint16("qos")
-		cleanSession, _ := cmd.Flags().GetBool("clean")
-		keepalive, _ := cmd.Flags().GetUint16("keepalive")
+		clientID, err := cmd.Flags().GetString("clientID")
+		if err != nil {
+			logger.Error("Failed to parse client ID", logger.ErrorAttr(err))
+			return
+		}
+
+		clients, err := cmd.Flags().GetInt("clients")
+		if err != nil {
+			logger.Error("Failed to parse number of clients", logger.ErrorAttr(err))
+			return
+		}
+
+		delay, err := cmd.Flags().GetInt("delay")
+		if err != nil {
+			logger.Error("Failed to parse delay", logger.ErrorAttr(err))
+			return
+		}
+
+		count, err := cmd.Flags().GetInt("count")
+		if err != nil {
+			logger.Error("Failed to parse message count", logger.ErrorAttr(err))
+			return
+		}
+
+		retain, err := cmd.Flags().GetBool("retain")
+		if err != nil {
+			logger.Error("Failed to parse retain flag", logger.ErrorAttr(err))
+			return
+		}
+
+		message, err := cmd.Flags().GetString("message")
+		if err != nil {
+			logger.Error("Failed to parse message", logger.ErrorAttr(err))
+			return
+		}
+
+		topic, err := cmd.Flags().GetString("topic")
+		if err != nil {
+			logger.Error("Failed to parse topic", logger.ErrorAttr(err))
+			return
+		}
+
+		qos, err := cmd.Flags().GetUint16("qos")
+		if err != nil {
+			logger.Error("Failed to parse QoS", logger.ErrorAttr(err))
+			return
+		}
+
+		cleanSession, err := cmd.Flags().GetBool("clean")
+		if err != nil {
+			logger.Error("Failed to parse clean session flag", logger.ErrorAttr(err))
+			return
+		}
+
+		keepalive, err := cmd.Flags().GetUint16("keepalive")
+		if err != nil {
+			logger.Error("Failed to parse keepalive", logger.ErrorAttr(err))
+			return
+		}
 
 		b, err := bench.NewBenchmark(
 			Cfg,
@@ -55,7 +107,7 @@ Parameters:
 			bench.WithMessage(message),
 		)
 		if err != nil {
-			logger.Error("Failed to create benchmark", logger.ErrorAttr(err))
+			logger.Error("Failed to create benchmark", logger.State("failed"), logger.ErrorAttr(err))
 			return
 		}
 

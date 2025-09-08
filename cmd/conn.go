@@ -19,11 +19,35 @@ var connCmd = &cobra.Command{
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 		// Parse flags
-		clients, _ := cmd.Flags().GetInt("clients")
-		delay, _ := cmd.Flags().GetInt("delay")
-		clean, _ := cmd.Flags().GetBool("clean")
-		keepalive, _ := cmd.Flags().GetUint16("keepalive")
-		clientID, _ := cmd.Flags().GetString("clientID")
+		clients, err := cmd.Flags().GetInt("clients")
+		if err != nil {
+			logger.Error("Failed to parse clients flag", logger.ErrorAttr(err))
+			return
+		}
+
+		delay, err := cmd.Flags().GetInt("delay")
+		if err != nil {
+			logger.Error("Failed to parse delay flag", logger.ErrorAttr(err))
+			return
+		}
+
+		clean, err := cmd.Flags().GetBool("clean")
+		if err != nil {
+			logger.Error("Failed to parse clean flag", logger.ErrorAttr(err))
+			return
+		}
+
+		keepalive, err := cmd.Flags().GetUint16("keepalive")
+		if err != nil {
+			logger.Error("Failed to parse keepalive flag", logger.ErrorAttr(err))
+			return
+		}
+
+		clientID, err := cmd.Flags().GetString("clientID")
+		if err != nil {
+			logger.Error("Failed to parse clientID flag", logger.ErrorAttr(err))
+			return
+		}
 
 		// Create benchmark
 		b, err := bench.NewBenchmark(
