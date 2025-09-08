@@ -23,10 +23,16 @@ func (b *Bench) PublishMessages() {
 		go func(id string) {
 			defer b.wg.Done()
 
-			client := mqtt.NewClient(b.cfg)
+			cfg := *b.cfg
+			cfg.Client.ClientID = id
+			cfg.Client.CleanSession = *b.cleanSession
+			cfg.Client.KeepAlive = b.keepAlive
+			client := mqtt.NewClient(&cfg)
+			b.logger.Info("Connecting Client", logger.ClientID(id), logger.State("connecting"))
+
 			if err := client.Connect(); err != nil {
 				atomic.AddInt32(&failed, int32(b.messageCount))
-				b.logger.Error("Client connection failed", logger.ErrorAttr(err))
+				b.logger.Error("Client connection failed", logger.ClientID(id), logger.ErrorAttr(err))
 				return
 			}
 			defer client.Disconnect()
