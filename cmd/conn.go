@@ -48,7 +48,7 @@ var connCmd = &cobra.Command{
 
 		select {
 		case <-sigs:
-			logger.Info("Received shutdown signal", logger.State("terminated"))
+			logger.Info("Received shutdown signal", logger.State("interrupted"))
 			return
 		case <-done:
 			logger.Info("Connection benchmark completed", logger.State("completed"))

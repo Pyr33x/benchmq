@@ -64,7 +64,7 @@ Parameters:
 
 		go func() {
 			<-sigs
-			logger.Info("Received shutdown signal", logger.State("completed"))
+			logger.Info("Received shutdown signal", logger.State("interrupted"))
 			os.Exit(0)
 		}()
 
