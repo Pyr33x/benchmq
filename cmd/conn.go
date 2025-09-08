@@ -1,6 +1,11 @@
 package cmd
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/pyr33x/benchmq/internal/bench"
 	"github.com/pyr33x/benchmq/pkg/logger"
 	"github.com/spf13/cobra"
@@ -11,6 +16,15 @@ var connCmd = &cobra.Command{
 	Short: "Run a connection benchmark against the configured MQTT broker.",
 	Long:  `Opens N concurrent MQTT connections (from config or flags) to measure connection throughput, failures, and timing.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+		go func() {
+			time.Sleep(500 * time.Millisecond)
+			logger.Info("shutdown", logger.State("completed"))
+			os.Exit(0)
+		}()
+
 		// Parse flags
 		clients, err := cmd.Flags().GetInt("clients")
 		if err != nil {

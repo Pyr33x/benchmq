@@ -125,7 +125,7 @@ func DevelopmentConfig() Config {
 		Output:      os.Stdout,
 		ShowCaller:  true,
 		AddSource:   true,
-		Service:     "goqtt",
+		Service:     "benchmq",
 		Version:     "dev",
 		Environment: "development",
 	}
@@ -139,7 +139,7 @@ func ProductionConfig() Config {
 		Output:      os.Stdout,
 		ShowCaller:  false,
 		AddSource:   false,
-		Service:     "goqtt",
+		Service:     "benchmq",
 		Environment: "production",
 	}
 }
