@@ -16,6 +16,9 @@ type Bench struct {
 	clients      int
 	clientID     string
 	topic        string
+	message      string
+	messageCount int
+	retained     bool
 	cleanSession *bool
 	qos          QoSLevel
 	keepAlive    uint16
@@ -42,6 +45,9 @@ const (
 	DefaultCleanSession = true             // Default clean session state
 	DefaultQoS          = QoS0             // Default QoS level
 	DefaultKeepAlive    = 60               // Default connection keep alive
+	DefaultMessageCount = 100              // Default message count
+	DefaultMessage      = "Hello, World!"  // Default message
+	DefaultRetained     = false            // Default retained message state
 )
 
 // NewBenchmark constructor initializes the bench struct
@@ -60,6 +66,9 @@ func NewBenchmark(cfg *config.Config, options ...Option) (*Bench, error) {
 		clients:      DefaultClients,
 		clientID:     DefaultClientID,
 		topic:        DefaultTopic,
+		message:      DefaultMessage,
+		messageCount: DefaultMessageCount,
+		retained:     DefaultRetained,
 		cleanSession: &cfg.Client.CleanSession,
 		qos:          DefaultQoS,
 		keepAlive:    cfg.Client.KeepAlive,
@@ -209,5 +218,23 @@ func WithPort(port uint16) Option {
 		if b.cfg != nil {
 			b.cfg.Server.Port = port
 		}
+	}
+}
+
+func WithMessage(message string) Option {
+	return func(b *Bench) {
+		b.message = message
+	}
+}
+
+func WithMessageCount(count int) Option {
+	return func(b *Bench) {
+		b.messageCount = count
+	}
+}
+
+func WithRetained(retained bool) Option {
+	return func(b *Bench) {
+		b.retained = retained
 	}
 }
