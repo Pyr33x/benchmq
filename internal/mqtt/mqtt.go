@@ -47,6 +47,28 @@ func (a *Adapter) Connect() error {
 	return nil
 }
 
+func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, callback func()) error {
+	token := a.client.Publish(topic, qos, retained, payload)
+	a.wg.Add(1)
+
+	go func() {
+		defer a.wg.Done()
+		callback()
+	}()
+	token.Wait()
+
+	if token.Error() != nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Publish",
+			Message: er.ErrPublishFailed,
+			Raw:     token.Error(),
+		}
+	}
+
+	return nil
+}
+
 func (a *Adapter) Disconnect() {
 	a.client.Disconnect(200)
 	a.wg.Wait()
