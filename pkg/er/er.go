@@ -18,6 +18,7 @@ var (
 	ErrEmptyHost            = errors.New("bench: host must be non-empty")
 	ErrEmptyTopic           = errors.New("bench: topic must be non-empty")
 	ErrNilConfig            = errors.New("bench: config cannot be nil")
+	ErrPublishFailed        = errors.New("mqtt: failed to publish")
 )
 
 type Error struct {
