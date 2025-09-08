@@ -10,11 +10,13 @@ import (
 	"github.com/pyr33x/benchmq/pkg/er"
 )
 
+// Adapter represents an MQTT adapter instance
 type Adapter struct {
 	client mq.Client
 	wg     sync.WaitGroup
 }
 
+// NewClient creates a new MQTT adapter instance
 func NewClient(cfg *config.Config) *Adapter {
 	// Initialize MQTT client options
 	opts := mq.NewClientOptions()
@@ -34,6 +36,7 @@ func NewClient(cfg *config.Config) *Adapter {
 	return &Adapter{client: client}
 }
 
+// Connect establishes a connection to the MQTT broker
 func (a *Adapter) Connect() error {
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
 		tErr := token.Error()
@@ -47,6 +50,7 @@ func (a *Adapter) Connect() error {
 	return nil
 }
 
+// Publish publishes a message to the specified topic with the given QoS level and retention flag
 func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, callback func()) error {
 	token := a.client.Publish(topic, qos, retained, payload)
 	a.wg.Add(1)
@@ -69,6 +73,7 @@ func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, ca
 	return nil
 }
 
+// Disconnect disconnects the client from the MQTT broker
 func (a *Adapter) Disconnect() {
 	a.client.Disconnect(200)
 	a.wg.Wait()
