@@ -284,6 +284,11 @@ func Bool(key string, value bool) slog.Attr {
 	return slog.Bool(key, value)
 }
 
+// Float creates a float attribute
+func Float(key string, value float64) slog.Attr {
+	return slog.Float64(key, value)
+}
+
 // Any creates an attribute with any value
 func Any(key string, value any) slog.Attr {
 	return slog.Any(key, value)
