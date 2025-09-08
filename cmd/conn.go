@@ -4,7 +4,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/pyr33x/benchmq/internal/bench"
 	"github.com/pyr33x/benchmq/pkg/logger"
@@ -19,43 +18,14 @@ var connCmd = &cobra.Command{
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-		go func() {
-			time.Sleep(500 * time.Millisecond)
-			logger.Info("shutdown", logger.State("completed"))
-			os.Exit(0)
-		}()
-
 		// Parse flags
-		clients, err := cmd.Flags().GetInt("clients")
-		if err != nil {
-			logger.Error("failed to parse clients flag", logger.ErrorAttr(err))
-			return
-		}
+		clients, _ := cmd.Flags().GetInt("clients")
+		delay, _ := cmd.Flags().GetInt("delay")
+		clean, _ := cmd.Flags().GetBool("clean")
+		keepalive, _ := cmd.Flags().GetUint16("keepalive")
+		clientID, _ := cmd.Flags().GetString("clientID")
 
-		delay, err := cmd.Flags().GetInt("delay")
-		if err != nil {
-			logger.Error("failed to parse delay flag", logger.ErrorAttr(err))
-			return
-		}
-
-		clean, err := cmd.Flags().GetBool("clean")
-		if err != nil {
-			logger.Error("failed to parse clean flag", logger.ErrorAttr(err))
-			return
-		}
-
-		keepalive, err := cmd.Flags().GetUint16("keepalive")
-		if err != nil {
-			logger.Error("failed to parse keepalive flag", logger.ErrorAttr(err))
-			return
-		}
-
-		clientID, err := cmd.Flags().GetString("clientID")
-		if err != nil {
-			logger.Error("failed to parse clientID flag", logger.ErrorAttr(err))
-			return
-		}
-
+		// Create benchmark
 		b, err := bench.NewBenchmark(
 			Cfg,
 			bench.WithClients(clients),
@@ -65,11 +35,24 @@ var connCmd = &cobra.Command{
 			bench.WithClientID(clientID),
 		)
 		if err != nil {
-			logger.Error("Benchmark failed", logger.ErrorAttr(err))
+			logger.Error("Failed to create benchmark", logger.ErrorAttr(err))
+			return
 		}
 
-		// Run benchmark
-		b.RunConnections()
+		// Run benchmark in a goroutine so we can wait for shutdown
+		done := make(chan struct{})
+		go func() {
+			b.RunConnections()
+			close(done)
+		}()
+
+		select {
+		case <-sigs:
+			logger.Info("Received shutdown signal", logger.State("terminated"))
+			return
+		case <-done:
+			logger.Info("Connection benchmark completed", logger.State("completed"))
+		}
 	},
 }
 
