@@ -68,6 +68,15 @@ func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, ca
 	token := a.client.Publish(topic, qos, retained, payload)
 	token.Wait()
 
+	if !token.WaitTimeout(30 * time.Second) {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Publish",
+			Message: er.ErrPublishFailed,
+			Raw:     fmt.Errorf("timeout waiting for publish token"),
+		}
+	}
+
 	if err := token.Error(); err != nil {
 		return &er.Error{
 			Package: "MQTT",
@@ -101,6 +110,15 @@ func (a *Adapter) Unsubscribe(topic string) error {
 
 	token := a.client.Unsubscribe(topic)
 	token.Wait()
+
+	if !token.WaitTimeout(30 * time.Second) {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Unsubscribe",
+			Message: er.ErrUnsubscribeFailed,
+			Raw:     fmt.Errorf("timeout waiting for unsubscribe token"),
+		}
+	}
 
 	if err := token.Error(); err != nil {
 		return &er.Error{
@@ -145,6 +163,15 @@ func (a *Adapter) Subscribe(topic string, qos byte, retained bool, callback func
 		}()
 	})
 	token.Wait()
+
+	if !token.WaitTimeout(30 * time.Second) {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Subscribe",
+			Message: er.ErrSubscribeFailed,
+			Raw:     fmt.Errorf("timeout waiting for subscribe token"),
+		}
+	}
 
 	if err := token.Error(); err != nil {
 		return &er.Error{
