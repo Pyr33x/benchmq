@@ -6,7 +6,6 @@ import (
 	"time"
 
 	mq "github.com/eclipse/paho.mqtt.golang"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pyr33x/benchmq/pkg/config"
 	"github.com/pyr33x/benchmq/pkg/er"
 	"github.com/pyr33x/benchmq/pkg/logger"
@@ -122,7 +121,7 @@ func (a *Adapter) Subscribe(topic string, qos byte, retained bool, callback func
 		return err
 	}
 
-	token := a.client.Subscribe(topic, qos, func(client mqtt.Client, msg mqtt.Message) {
+	token := a.client.Subscribe(topic, qos, func(client mq.Client, msg mq.Message) {
 		payload := string(msg.Payload())
 		a.wg.Add(1)
 		go func() {
