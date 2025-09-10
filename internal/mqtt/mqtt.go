@@ -80,6 +80,27 @@ func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, ca
 	return nil
 }
 
+// Unsubscribe unsubscribes from the specified topic
+func (a *Adapter) Unsubscribe(topic string) error {
+	if err := a.Validate(topic, 0); err != nil {
+		return err
+	}
+
+	token := a.client.Unsubscribe(topic)
+	token.Wait()
+
+	if err := token.Error(); err != nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Unsubscribe",
+			Message: er.ErrUnsubscribeFailed,
+			Raw:     err,
+		}
+	}
+
+	return nil
+}
+
 // Subscribe subscribes to the specified topic with the given QoS level and retention flag
 func (a *Adapter) Subscribe(topic string, qos byte, retained bool, callback func(payload string)) error {
 	if err := a.Validate(topic, qos); err != nil {
