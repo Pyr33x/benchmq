@@ -9,6 +9,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pyr33x/benchmq/pkg/config"
 	"github.com/pyr33x/benchmq/pkg/er"
+	"github.com/pyr33x/benchmq/pkg/logger"
 )
 
 // Adapter represents an MQTT adapter instance
@@ -53,6 +54,14 @@ func (a *Adapter) Connect() error {
 
 // Publish publishes a message to the specified topic with the given QoS level and retention flag
 func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, callback func()) error {
+	if callback == nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Publish",
+			Message: er.ErrNilCallback,
+		}
+	}
+
 	if err := a.Validate(topic, qos); err != nil {
 		return err
 	}
@@ -69,13 +78,11 @@ func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, ca
 		}
 	}
 
-	if callback != nil {
-		a.wg.Add(1)
-		go func() {
-			defer a.wg.Done()
-			callback()
-		}()
-	}
+	a.wg.Add(1)
+	go func() {
+		defer a.wg.Done()
+		callback()
+	}()
 
 	return nil
 }
@@ -103,6 +110,14 @@ func (a *Adapter) Unsubscribe(topic string) error {
 
 // Subscribe subscribes to the specified topic with the given QoS level and retention flag
 func (a *Adapter) Subscribe(topic string, qos byte, retained bool, callback func(payload string)) error {
+	if callback == nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Subscribe",
+			Message: er.ErrNilCallback,
+		}
+	}
+
 	if err := a.Validate(topic, qos); err != nil {
 		return err
 	}
@@ -112,6 +127,14 @@ func (a *Adapter) Subscribe(topic string, qos byte, retained bool, callback func
 		a.wg.Add(1)
 		go func() {
 			defer a.wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					logger.Error("panic in subscription callback",
+						logger.Any("recover", r),
+						logger.String("topic", topic),
+					)
+				}
+			}()
 			callback(payload)
 		}()
 	})
