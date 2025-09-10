@@ -6,6 +6,7 @@ import (
 	"time"
 
 	mq "github.com/eclipse/paho.mqtt.golang"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pyr33x/benchmq/pkg/config"
 	"github.com/pyr33x/benchmq/pkg/er"
 )
@@ -52,19 +53,8 @@ func (a *Adapter) Connect() error {
 
 // Publish publishes a message to the specified topic with the given QoS level and retention flag
 func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, callback func()) error {
-	if topic == "" {
-		return &er.Error{
-			Package: "MQTT",
-			Func:    "Publish",
-			Message: er.ErrEmptyTopic,
-		}
-	}
-	if qos > 2 {
-		return &er.Error{
-			Package: "MQTT",
-			Func:    "Publish",
-			Message: er.ErrInvalidQoS,
-		}
+	if err := a.Validate(topic, qos); err != nil {
+		return err
 	}
 
 	token := a.client.Publish(topic, qos, retained, payload)
@@ -85,6 +75,54 @@ func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, ca
 			defer a.wg.Done()
 			callback()
 		}()
+	}
+
+	return nil
+}
+
+// Subscribe subscribes to the specified topic with the given QoS level and retention flag
+func (a *Adapter) Subscribe(topic string, qos byte, retained bool, callback func(payload string)) error {
+	if err := a.Validate(topic, qos); err != nil {
+		return err
+	}
+
+	token := a.client.Subscribe(topic, qos, func(client mqtt.Client, msg mqtt.Message) {
+		payload := string(msg.Payload())
+		a.wg.Add(1)
+		go func() {
+			defer a.wg.Done()
+			callback(payload)
+		}()
+	})
+	token.Wait()
+
+	if err := token.Error(); err != nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Subscribe",
+			Message: er.ErrSubscribeFailed,
+			Raw:     err,
+		}
+	}
+
+	return nil
+}
+
+// Validate validates the topic and QoS level
+func (a *Adapter) Validate(topic string, qos byte) error {
+	if topic == "" {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Validate",
+			Message: er.ErrEmptyTopic,
+		}
+	}
+	if qos > 2 {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Validate",
+			Message: er.ErrInvalidQoS,
+		}
 	}
 
 	return nil
