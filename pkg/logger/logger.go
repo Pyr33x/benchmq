@@ -249,6 +249,18 @@ func (l *Logger) LogPublish(clientID, topic string, qos int, retain bool, attrs 
 	l.LogAttrs(context.Background(), slog.LevelInfo, "Published", baseAttrs...)
 }
 
+// LogSubscribe logs SUBSCRIBE packet details
+func (l *Logger) LogSubscribe(clientID, topic string, qos int, attrs ...slog.Attr) {
+	baseAttrs := []slog.Attr{
+		slog.String("client_id", clientID),
+		slog.String("topic", topic),
+		slog.Int("qos", qos),
+	}
+	baseAttrs = append(baseAttrs, attrs...)
+
+	l.LogAttrs(context.Background(), slog.LevelInfo, "Subscribed", baseAttrs...)
+}
+
 // ClientID creates a client_id attribute
 func ClientID(clientID string) slog.Attr {
 	return slog.String("client_id", clientID)
