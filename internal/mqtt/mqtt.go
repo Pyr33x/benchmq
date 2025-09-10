@@ -80,6 +80,13 @@ func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, ca
 	a.wg.Add(1)
 	go func() {
 		defer a.wg.Done()
+		defer func() {
+			if r := recover(); r != nil {
+				logger.Error("panic in publish callback",
+					logger.Any("recover", r),
+				)
+			}
+		}()
 		callback()
 	}()
 
