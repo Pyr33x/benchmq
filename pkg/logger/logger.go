@@ -252,7 +252,7 @@ func (l *Logger) LogPublish(clientID, topic string, qos int, retain bool, attrs 
 // LogSubscribe logs SUBSCRIBE packet details
 func (l *Logger) LogSubscribe(clientID, topic string, qos int, attrs ...slog.Attr) {
 	baseAttrs := []slog.Attr{
-		slog.String("client_id", clientID),
+		ClientID(clientID),
 		slog.String("topic", topic),
 		slog.Int("qos", qos),
 	}
