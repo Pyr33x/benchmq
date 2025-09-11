@@ -8,6 +8,7 @@ import (
 	mq "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pyr33x/benchmq/pkg/config"
 	"github.com/pyr33x/benchmq/pkg/er"
+	"github.com/pyr33x/benchmq/pkg/logger"
 )
 
 // Adapter represents an MQTT adapter instance
@@ -52,23 +53,29 @@ func (a *Adapter) Connect() error {
 
 // Publish publishes a message to the specified topic with the given QoS level and retention flag
 func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, callback func()) error {
-	if topic == "" {
+	if callback == nil {
 		return &er.Error{
 			Package: "MQTT",
 			Func:    "Publish",
-			Message: er.ErrEmptyTopic,
+			Message: er.ErrNilCallback,
 		}
 	}
-	if qos > 2 {
-		return &er.Error{
-			Package: "MQTT",
-			Func:    "Publish",
-			Message: er.ErrInvalidQoS,
-		}
+
+	if err := a.Validate(topic, qos); err != nil {
+		return err
 	}
 
 	token := a.client.Publish(topic, qos, retained, payload)
 	token.Wait()
+
+	if !token.WaitTimeout(30 * time.Second) {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Publish",
+			Message: er.ErrPublishFailed,
+			Raw:     fmt.Errorf("timeout waiting for publish token"),
+		}
+	}
 
 	if err := token.Error(); err != nil {
 		return &er.Error{
@@ -79,12 +86,120 @@ func (a *Adapter) Publish(topic string, qos byte, retained bool, payload any, ca
 		}
 	}
 
-	if callback != nil {
+	a.wg.Add(1)
+	go func() {
+		defer a.wg.Done()
+		defer func() {
+			if r := recover(); r != nil {
+				logger.Error("panic in publish callback",
+					logger.Any("recover", r),
+				)
+			}
+		}()
+		callback()
+	}()
+
+	return nil
+}
+
+// Unsubscribe unsubscribes from the specified topic
+func (a *Adapter) Unsubscribe(topic string) error {
+	if err := a.Validate(topic, 0); err != nil {
+		return err
+	}
+
+	token := a.client.Unsubscribe(topic)
+	token.Wait()
+
+	if !token.WaitTimeout(30 * time.Second) {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Unsubscribe",
+			Message: er.ErrUnsubscribeFailed,
+			Raw:     fmt.Errorf("timeout waiting for unsubscribe token"),
+		}
+	}
+
+	if err := token.Error(); err != nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Unsubscribe",
+			Message: er.ErrUnsubscribeFailed,
+			Raw:     err,
+		}
+	}
+
+	return nil
+}
+
+// Subscribe subscribes to the specified topic with the given QoS level and retention flag
+func (a *Adapter) Subscribe(topic string, qos byte, retained bool, callback func(payload string)) error {
+	if callback == nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Subscribe",
+			Message: er.ErrNilCallback,
+		}
+	}
+
+	if err := a.Validate(topic, qos); err != nil {
+		return err
+	}
+
+	token := a.client.Subscribe(topic, qos, func(client mq.Client, msg mq.Message) {
+		payload := string(msg.Payload())
 		a.wg.Add(1)
 		go func() {
 			defer a.wg.Done()
-			callback()
+			defer func() {
+				if r := recover(); r != nil {
+					logger.Error("panic in subscription callback",
+						logger.Any("recover", r),
+						logger.String("topic", topic),
+					)
+				}
+			}()
+			callback(payload)
 		}()
+	})
+	token.Wait()
+
+	if !token.WaitTimeout(30 * time.Second) {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Subscribe",
+			Message: er.ErrSubscribeFailed,
+			Raw:     fmt.Errorf("timeout waiting for subscribe token"),
+		}
+	}
+
+	if err := token.Error(); err != nil {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Subscribe",
+			Message: er.ErrSubscribeFailed,
+			Raw:     err,
+		}
+	}
+
+	return nil
+}
+
+// Validate validates the topic and QoS level
+func (a *Adapter) Validate(topic string, qos byte) error {
+	if topic == "" {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Validate",
+			Message: er.ErrEmptyTopic,
+		}
+	}
+	if qos > 2 {
+		return &er.Error{
+			Package: "MQTT",
+			Func:    "Validate",
+			Message: er.ErrInvalidQoS,
+		}
 	}
 
 	return nil

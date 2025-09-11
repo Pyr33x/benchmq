@@ -19,6 +19,9 @@ var (
 	ErrEmptyTopic           = errors.New("bench: topic must be non-empty")
 	ErrNilConfig            = errors.New("bench: config cannot be nil")
 	ErrPublishFailed        = errors.New("mqtt: failed to publish")
+	ErrSubscribeFailed      = errors.New("mqtt: failed to subscribe")
+	ErrUnsubscribeFailed    = errors.New("mqtt: failed to unsubscribe")
+	ErrNilCallback          = errors.New("bench: callback cannot be nil")
 )
 
 type Error struct {
