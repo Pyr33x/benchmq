@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pyr33x/benchmq/pkg/config"
-	"github.com/pyr33x/benchmq/pkg/logger"
+	"github.com/rayomqio/benchmq/pkg/config"
+	"github.com/rayomqio/benchmq/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

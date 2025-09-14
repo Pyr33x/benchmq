@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"os"
 
-	"github.com/pyr33x/benchmq/pkg/er"
+	"github.com/rayomqio/benchmq/pkg/er"
 	"gopkg.in/yaml.v3"
 )
 

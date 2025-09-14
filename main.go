@@ -1,6 +1,6 @@
 package main
 
-import "github.com/pyr33x/benchmq/cmd"
+import "github.com/rayomqio/benchmq/cmd"
 
 func main() {
 	cmd.Execute()

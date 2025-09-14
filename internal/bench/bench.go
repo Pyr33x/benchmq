@@ -3,9 +3,9 @@ package bench
 import (
 	"sync"
 
-	"github.com/pyr33x/benchmq/pkg/config"
-	"github.com/pyr33x/benchmq/pkg/er"
-	"github.com/pyr33x/benchmq/pkg/logger"
+	"github.com/rayomqio/benchmq/pkg/config"
+	"github.com/rayomqio/benchmq/pkg/er"
+	"github.com/rayomqio/benchmq/pkg/logger"
 )
 
 type QoSLevel uint8

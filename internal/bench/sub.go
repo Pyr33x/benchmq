@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/pyr33x/benchmq/internal/mqtt"
-	"github.com/pyr33x/benchmq/pkg/logger"
+	"github.com/rayomqio/benchmq/internal/mqtt"
+	"github.com/rayomqio/benchmq/pkg/logger"
 )
 
 func (b *Bench) Subscribe() {

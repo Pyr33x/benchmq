@@ -5,8 +5,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/pyr33x/benchmq/internal/bench"
-	"github.com/pyr33x/benchmq/pkg/logger"
+	"github.com/rayomqio/benchmq/internal/bench"
+	"github.com/rayomqio/benchmq/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

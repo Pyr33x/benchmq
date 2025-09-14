@@ -6,9 +6,9 @@ import (
 	"time"
 
 	mq "github.com/eclipse/paho.mqtt.golang"
-	"github.com/pyr33x/benchmq/pkg/config"
-	"github.com/pyr33x/benchmq/pkg/er"
-	"github.com/pyr33x/benchmq/pkg/logger"
+	"github.com/rayomqio/benchmq/pkg/config"
+	"github.com/rayomqio/benchmq/pkg/er"
+	"github.com/rayomqio/benchmq/pkg/logger"
 )
 
 // Adapter represents an MQTT adapter instance
