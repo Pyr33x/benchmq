@@ -1,3 +1,4 @@
+# .goreleaser.yml
 version: 2
 
 before:
@@ -7,21 +8,20 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    main: ./main.go
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
     goos:
+      - darwin
       - linux
       - windows
-      - darwin
     goarch:
       - amd64
+      - arm64
 
 archives:
   - formats: [tar.gz]
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
         formats: [zip]
@@ -33,3 +33,19 @@ release:
   github:
     owner: rayomqio
     name: benchmq
+
+brews:
+  - name: benchmq
+    repository:
+      owner: rayomqio
+      name: homebrew-tap
+    commit_author:
+      name: "pyr33x"
+      email: "136649231+pyr33x@users.noreply.github.com"
+    description: "BenchMQ is a simple, fast, and lightweight CLI to benchmark your MQTT broker with ease"
+    homepage: "https://github.com/rayomqio/benchmq"
+    license: "Apache-2.0"
+    install: |
+      bin.install "benchmq"
+    test: |
+      system "#{bin}/benchmq", "--help"
