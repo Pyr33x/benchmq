@@ -26,11 +26,15 @@ func Execute() {
 
 func init() {
 	cfg, err := config.InitializeCfg()
-	if err != nil || cfg == nil {
+	if err != nil {
 		logger.InitGlobalLogger(logger.DevelopmentConfig())
 		logger.Error("Failed to initialize config", logger.ErrorAttr(err))
-		Cfg = cfg
-		return
+		os.Exit(1)
+	}
+	if cfg == nil {
+		logger.InitGlobalLogger(logger.DevelopmentConfig())
+		logger.Error("Config is nil, this should not happen")
+		os.Exit(1)
 	}
 	Cfg = cfg
 

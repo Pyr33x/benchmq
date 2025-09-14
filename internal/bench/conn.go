@@ -21,6 +21,8 @@ func (b *Bench) RunConnections() {
 			cfg.Client.ClientID = fmt.Sprintf("%s-%d", b.clientID, id)
 			cfg.Client.CleanSession = *b.cleanSession
 			cfg.Client.KeepAlive = b.keepAlive
+			cfg.Client.Username = b.username
+			cfg.Client.Password = b.password
 			client := mqtt.NewClient(&cfg)
 			defer client.Disconnect()
 

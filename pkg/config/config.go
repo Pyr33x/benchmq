@@ -33,28 +33,36 @@ type Client struct {
 }
 
 // InitializeCfg reads the config file and returns a pointer to the Config struct
+// If config.yml doesn't exist, it returns a config with default values
 func InitializeCfg() (*Config, error) {
+	var cfg Config
+	configFileExists := false
+
+	// Try to read config file, but don't fail if it doesn't exist
 	rawCfg, err := os.ReadFile("config.yml")
-	if err != nil {
+	if err == nil {
+		configFileExists = true
+		// Config file exists, parse it
+		dec := yaml.NewDecoder(bytes.NewReader(rawCfg))
+		dec.KnownFields(true)
+		if err = dec.Decode(&cfg); err != nil {
+			return nil, &er.Error{
+				Package: "Config",
+				Func:    "InitializeCfg",
+				Message: er.ErrUnmarshalFailed,
+			}
+		}
+	} else if !os.IsNotExist(err) {
+		// File exists but we can't read it (permissions, etc.)
 		return nil, &er.Error{
 			Package: "Config",
 			Func:    "InitializeCfg",
 			Message: er.ErrConfigReadFailed,
 		}
 	}
+	// If config file doesn't exist, cfg remains with zero values which will be filled by SetDefaults()
 
-	var cfg Config
-	dec := yaml.NewDecoder(bytes.NewReader(rawCfg))
-	dec.KnownFields(true)
-	if err = dec.Decode(&cfg); err != nil {
-		return nil, &er.Error{
-			Package: "Config",
-			Func:    "InitializeCfg",
-			Message: er.ErrUnmarshalFailed,
-		}
-	}
-
-	cfg.SetDefaults()
+	cfg.SetDefaults(configFileExists)
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
@@ -82,7 +90,11 @@ func (c *Config) Validate() error {
 }
 
 // SetDefaults sets the default values to fields when values are not acceptable
-func (c *Config) SetDefaults() {
+// configFileExists indicates whether a config file was successfully loaded
+func (c *Config) SetDefaults(configFileExists bool) {
+	if c.Name == "" {
+		c.Name = "BenchMQ"
+	}
 	if c.Version == "" {
 		c.Version = "1.0.0"
 	}
@@ -95,7 +107,15 @@ func (c *Config) SetDefaults() {
 	if c.Server.Port == 0 {
 		c.Server.Port = 1883
 	}
+	if c.Client.ClientID == "" {
+		c.Client.ClientID = "benchmq-client"
+	}
 	if c.Client.KeepAlive == 0 {
 		c.Client.KeepAlive = 60
+	}
+	// Only set CleanSession default when no config file exists
+	// If config file exists, respect the explicit value (even if false)
+	if !configFileExists && !c.Client.CleanSession {
+		c.Client.CleanSession = true
 	}
 }
