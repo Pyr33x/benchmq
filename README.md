@@ -31,6 +31,18 @@ cd benchmq
 go build -o benchmq .
 ```
 
+#### Using Docker
+```bash
+# Pull from Docker Hub (when available)
+docker pull me3di/benchmq:latest
+
+# Or build locally
+docker build -t benchmq .
+
+# Run with Docker
+docker run --rm benchmq --help
+```
+
 ### Basic Usage
 
 BenchMQ works out of the box with sensible defaults. No configuration file needed!
@@ -75,6 +87,29 @@ benchmq pub -t test/topic -m "Hello World" -c 10
 # Subscribe to a topic
 benchmq sub -t test/topic -c 5
 ```
+
+### Docker Usage
+
+When using Docker, you can run BenchMQ commands by passing them as arguments:
+
+```bash
+# Test connections using Docker
+docker run --rm benchmq conn -c 50
+
+# Publish messages using Docker
+docker run --rm benchmq pub -t test/topic -m "Hello Docker" -c 10
+
+# Subscribe to messages using Docker
+docker run --rm benchmq sub -t test/topic -c 5
+
+# Connect to external MQTT broker (replace with your broker's IP/hostname)
+docker run --rm benchmq conn --host broker.hivemq.com --port 1883 -c 10
+```
+
+**Note**: When running in Docker, `localhost` refers to the container itself. To connect to an MQTT broker on your host machine or external services, you'll need to:
+- Use `host.docker.internal` (macOS/Windows) to connect to host machine
+- Use the actual IP address or hostname of your MQTT broker
+- Use Docker networks for container-to-container communication
 
 ## Commands
 
