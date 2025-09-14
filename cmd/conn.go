@@ -49,6 +49,18 @@ var connCmd = &cobra.Command{
 			return
 		}
 
+		username, err := cmd.Flags().GetString("username")
+		if err != nil {
+			logger.Error("Failed to parse username flag", logger.ErrorAttr(err))
+			return
+		}
+
+		password, err := cmd.Flags().GetString("password")
+		if err != nil {
+			logger.Error("Failed to parse password flag", logger.ErrorAttr(err))
+			return
+		}
+
 		// Create benchmark
 		b, err := bench.NewBenchmark(
 			Cfg,
@@ -57,6 +69,8 @@ var connCmd = &cobra.Command{
 			bench.WithCleanSession(clean),
 			bench.WithKeepAlive(keepalive),
 			bench.WithClientID(clientID),
+			bench.WithUsername(username),
+			bench.WithPassword(password),
 		)
 		if err != nil {
 			logger.Error("Failed to create benchmark", logger.ErrorAttr(err))
@@ -89,4 +103,6 @@ func init() {
 	connCmd.Flags().IntP("delay", "d", 1000, "Delay between each client connection in milliseconds")
 	connCmd.Flags().BoolP("clean", "x", true, "Clean previous session when connecting")
 	connCmd.Flags().Uint16P("keepalive", "k", 60, "Keepalive interval in seconds")
+	connCmd.Flags().StringP("username", "u", "", "Username for MQTT connections")
+	connCmd.Flags().StringP("password", "p", "", "Password for MQTT connections")
 }

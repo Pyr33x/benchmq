@@ -27,6 +27,8 @@ func (b *Bench) PublishMessages() {
 			cfg.Client.ClientID = id
 			cfg.Client.CleanSession = *b.cleanSession
 			cfg.Client.KeepAlive = b.keepAlive
+			cfg.Client.Username = b.username
+			cfg.Client.Password = b.password
 			client := mqtt.NewClient(&cfg)
 			b.logger.Info("Connecting Client", logger.ClientID(id), logger.State("connecting"))
 

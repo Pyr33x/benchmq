@@ -93,6 +93,18 @@ Parameters:
 			return
 		}
 
+		username, err := cmd.Flags().GetString("username")
+		if err != nil {
+			logger.Error("Failed to parse username", logger.ErrorAttr(err))
+			return
+		}
+
+		password, err := cmd.Flags().GetString("password")
+		if err != nil {
+			logger.Error("Failed to parse password", logger.ErrorAttr(err))
+			return
+		}
+
 		b, err := bench.NewBenchmark(
 			Cfg,
 			bench.WithClientID(clientID),
@@ -105,6 +117,8 @@ Parameters:
 			bench.WithCleanSession(cleanSession),
 			bench.WithKeepAlive(keepalive),
 			bench.WithMessage(message),
+			bench.WithUsername(username),
+			bench.WithPassword(password),
 		)
 		if err != nil {
 			logger.Error("Failed to create benchmark", logger.State("failed"), logger.ErrorAttr(err))
@@ -135,4 +149,6 @@ func init() {
 	pubCmd.Flags().StringP("topic", "t", "benchmq", "Topic to publish messages to")
 	pubCmd.Flags().BoolP("clean", "x", true, "Clean previous session when connecting")
 	pubCmd.Flags().Uint16P("keepalive", "k", 60, "Keepalive interval in seconds")
+	pubCmd.Flags().StringP("username", "u", "", "Username for MQTT connections")
+	pubCmd.Flags().StringP("password", "p", "", "Password for MQTT connections")
 }

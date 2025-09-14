@@ -24,6 +24,8 @@ type Bench struct {
 	keepAlive    uint16
 	host         string
 	port         uint16
+	username     string
+	password     string
 	wg           sync.WaitGroup // Wait Group
 	cfg          *config.Config // Config
 	logger       *logger.Logger // Logger
@@ -236,5 +238,17 @@ func WithMessageCount(count int) Option {
 func WithRetained(retained bool) Option {
 	return func(b *Bench) {
 		b.retained = retained
+	}
+}
+
+func WithUsername(username string) Option {
+	return func(b *Bench) {
+		b.username = username
+	}
+}
+
+func WithPassword(password string) Option {
+	return func(b *Bench) {
+		b.password = password
 	}
 }
