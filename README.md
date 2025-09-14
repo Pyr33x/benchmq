@@ -19,7 +19,7 @@
 #### Using Homebrew
 ```bash
 # Add the tap
-brew tap rayomqio/benchmq
+brew tap rayomqio/tap
 
 # Install benchmq
 brew install benchmq
