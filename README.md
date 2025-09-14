@@ -16,6 +16,15 @@
 
 ### Download
 
+#### Using Homebrew
+```bash
+# Add the tap
+brew tap rayomqio/benchmq
+
+# Install benchmq
+brew install benchmq
+```
+
 #### Using Go Install
 ```bash
 go install github.com/rayomqio/benchmq@latest
