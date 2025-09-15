@@ -42,6 +42,9 @@ go build -o benchmq .
 
 #### Using Docker
 ```bash
+# Pull from GitHub Container Registry (GHCR)
+docker pull ghcr.io/rayomqio/benchmq:latest
+
 # Pull from Docker Hub (when available)
 docker pull me3di/benchmq:latest
 
@@ -49,7 +52,7 @@ docker pull me3di/benchmq:latest
 docker build -t benchmq .
 
 # Run with Docker
-docker run --rm benchmq --help
+docker run --rm ghcr.io/rayomqio/benchmq:latest --help
 ```
 
 ### Basic Usage
@@ -103,16 +106,16 @@ When using Docker, you can run BenchMQ commands by passing them as arguments:
 
 ```bash
 # Test connections using Docker
-docker run --rm benchmq conn -c 50
+docker run --rm ghcr.io/rayomqio/benchmq:latest conn -c 50
 
 # Publish messages using Docker
-docker run --rm benchmq pub -t test/topic -m "Hello Docker" -c 10
+docker run --rm ghcr.io/rayomqio/benchmq:latest pub -t test/topic -m "Hello Docker" -c 10
 
 # Subscribe to messages using Docker
-docker run --rm benchmq sub -t test/topic -c 5
+docker run --rm ghcr.io/rayomqio/benchmq:latest sub -t test/topic -c 5
 
 # Connect to external MQTT broker (replace with your broker's IP/hostname)
-docker run --rm benchmq conn --host broker.hivemq.com --port 1883 -c 10
+docker run --rm ghcr.io/rayomqio/benchmq:latest conn --host broker.hivemq.com --port 1883 -c 10
 ```
 
 **Note**: When running in Docker, `localhost` refers to the container itself. To connect to an MQTT broker on your host machine or external services, you'll need to:
