@@ -37,5 +37,5 @@ func (b *Bench) RunConnections() {
 	}
 
 	b.wg.Wait()
-	b.logger.Info("Finished connection benchmark", logger.String("time", fmt.Sprintf("%fs", logger.TrackRawTime(start))))
+	b.logger.Info("Finished connection benchmark", logger.Any("time", time.Since(start).Seconds()))
 }

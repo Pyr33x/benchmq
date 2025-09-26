@@ -11,7 +11,7 @@ import (
 
 func (b *Bench) PublishMessages() {
 	start := time.Now()
-	b.logger.Info("Started publish benchmark", logger.Int("startTime", int(start.UnixNano())))
+	b.logger.Info("Started publish benchmark", logger.String("start", start.Format(time.RFC3339Nano)))
 
 	var failed int32
 	var succeeded int32

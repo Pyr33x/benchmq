@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 )
 
 // LogLevel represents logging levels
@@ -269,16 +268,6 @@ func ClientID(clientID string) slog.Attr {
 // State creates a state attribute
 func State(state string) slog.Attr {
 	return slog.String("state", state)
-}
-
-// TrackTime creates a time attribute
-func TrackTime(t time.Time) slog.Attr {
-	return slog.Float64("time", float64(time.Since(t).Seconds()))
-}
-
-// TrackRaw creates a raw attribute
-func TrackRawTime(t time.Time) float64 {
-	return float64(time.Since(t).Seconds())
 }
 
 // String creates a string attribute
